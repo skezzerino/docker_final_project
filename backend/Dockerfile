@@ -13,8 +13,8 @@ WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY . .
 
-# Даем права пользователю node
-RUN chown -R node:node /app
+# Даем права пользователю node и создаем папку для логов
+RUN mkdir -p /app/logs && chown -R node:node /app
 
 USER node
 

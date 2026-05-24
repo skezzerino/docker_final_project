@@ -19,6 +19,23 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "healthy" });
 });
 
+// Настройка логирования в файл
+const logDir = path.join(__dirname, "logs");
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true });
+}
+const accessLogStream = fs.createWriteStream(path.join(logDir, "access.log"), {
+  flags: "a",
+});
+
+// Middleware для логирования каждого запроса
+app.use((req, res, next) => {
+  const logEntry = `[${new Date().toISOString()}] ${req.method} ${req.url}\n`;
+  accessLogStream.write(logEntry);
+  console.log(logEntry.trim());
+  next();
+});
+
 app.get("/api/clients", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM clients");
